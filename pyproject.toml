@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "trailblazer-scraper"
+version = "0.1.0"
+description = "Retrieve public data from Salesforce Trailblazer user profiles"
+authors = ["Aaron George <angeorge.dev@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+requests = "^2.25.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
