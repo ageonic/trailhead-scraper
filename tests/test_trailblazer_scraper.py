@@ -21,6 +21,7 @@ def test_fetch_rank_data():
     assert u.rank_data is not None
     assert "Id" in u.rank_data
 
+
 def test_fetch_awards():
     u = Profile("ecastelli")
     assert len(u.awards) <= 0
