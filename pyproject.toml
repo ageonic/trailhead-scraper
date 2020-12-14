@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "trailblazer-scraper"
+name = "trailhead-scraper"
 version = "0.1.0"
-description = "Retrieve public data from Salesforce Trailblazer user profiles"
+description = "Retrieve public data from Salesforce Trailhead user profiles"
 authors = ["Aaron George <angeorge.dev@gmail.com>"]
 
 [tool.poetry.dependencies]

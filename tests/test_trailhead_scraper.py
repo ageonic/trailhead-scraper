@@ -1,4 +1,4 @@
-from trailblazer_scraper import Profile
+from trailhead_scraper import Profile
 
 
 def test_tbid_provided():

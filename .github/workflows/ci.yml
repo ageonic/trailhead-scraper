@@ -1,4 +1,4 @@
-name: Trailblazer Scraper CI
+name: Trailhead Scraper CI
 
 on:
   push:

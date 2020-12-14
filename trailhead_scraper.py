@@ -12,7 +12,7 @@ class AuraPayload:
         """Initialize the payload.
 
         Args:
-            uri (str): The path to the Trailblazer profile page.
+            uri (str): The path to the Trailhead profile page.
             action_descriptor (str, optional): The value that will be used as the descriptor value in the payload. Defaults to 'aura://ApexActionController/ACTION$execute'.
         """
         self.message = {"actions": []}
@@ -60,16 +60,16 @@ class AuraPayload:
 
 
 class Profile:
-    """A collection of user details, rank data, and awards collected from a Trailblazer profile."""
+    """A collection of user details, rank data, and awards collected from a Trailhead profile."""
 
     base_url = "https://trailblazer.me"
     aura_url = base_url + "/aura"
 
     def __init__(self, username, tbid=None):
-        """Initialize the Trailblazer profile.
+        """Initialize the Trailhead profile.
 
         Args:
-            username (str): The Trailblazer username.
+            username (str): The Trailhead username.
             tbid (str, optional): The Trailblazer ID for the user (if available). Defaults to None.
         """
         self.username = username
@@ -109,7 +109,7 @@ class Profile:
         return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
     def fetch_rank_data(self):
-        """Retrieve rank information for the Trailblazer user profile."""
+        """Retrieve rank information for the Trailhead user profile."""
         payload = AuraPayload(self.path)
         payload.add_action(
             "TrailheadProfileService",
@@ -124,7 +124,7 @@ class Profile:
         self.rank_data = body["value"][0]["ProfileCounts"][0]
 
     def fetch_awards(self):
-        """Retrieve all awards for the Trailblazer user profile."""
+        """Retrieve all awards for the Trailhead user profile."""
         if self.rank_data is None:
             self.fetch_rank_data()
 
