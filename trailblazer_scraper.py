@@ -52,6 +52,7 @@ class Profile:
         self.last_name = None
 
         self.rank_data = None
+        self.awards = []
 
         if tbid is None:
             self._scrape_basics()
@@ -80,3 +81,23 @@ class Profile:
         body = json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
         self.rank_data = body["value"][0]["ProfileCounts"][0]
+
+    def fetch_awards(self):
+        if self.rank_data is None:
+            self.fetch_rank_data()
+
+        for skip in range(0, self.rank_data["EarnedBadgeTotal"], 30):
+
+            payload = AuraPayload(self.path)
+            payload.add_action(
+                "TrailheadProfileService",
+                "fetchTrailheadBadges",
+                {"userId": self.tbid, "skip": skip, "perPage": 30, "filter": "All"},
+            )
+
+            response = requests.post(self.aura_url, data=payload.json())
+
+            j = json.loads(response.text)
+            body = json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+
+            self.awards = [*self.awards, *body["value"][0]["EarnedAwards"]]
