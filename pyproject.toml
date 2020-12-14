@@ -5,7 +5,7 @@ description = "Retrieve public data from Salesforce Trailblazer user profiles"
 authors = ["Aaron George <angeorge.dev@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 requests = "^2.25.0"
 
 [tool.poetry.dev-dependencies]
