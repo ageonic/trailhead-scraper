@@ -1,4 +1,4 @@
-name: Trailhead Scraper CI
+name: Tests
 
 on:
   push:
