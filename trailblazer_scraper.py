@@ -15,7 +15,7 @@ class AuraPayload:
             action_descriptor or "aura://ApexActionController/ACTION$execute"
         )
 
-    def add_action(self, class_name, method_name, user_id):
+    def add_action(self, class_name, method_name, inner_params):
         self.message["actions"].append(
             {
                 "descriptor": self.action_descriptor,
@@ -23,9 +23,7 @@ class AuraPayload:
                     "namespace": "",
                     "classname": class_name,
                     "method": method_name,
-                    "params": {
-                        "userId": user_id,
-                    },
+                    "params": inner_params,
                     "cacheable": False,
                     "isContinuation": False,
                 },
@@ -68,7 +66,13 @@ class Profile:
 
     def fetch_rank_data(self):
         payload = AuraPayload(self.path)
-        payload.add_action("TrailheadProfileService", "fetchTrailheadData", self.tbid)
+        payload.add_action(
+            "TrailheadProfileService",
+            "fetchTrailheadData",
+            {
+                "userId": self.tbid,
+            },
+        )
 
         response = requests.post(self.aura_url, data=payload.json())
 
