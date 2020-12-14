@@ -65,6 +65,12 @@ class Profile:
         self.first_name = re.search(r'FirstName\\":\\"(.*?)\\', page.text).group(1)
         self.last_name = re.search(r'LastName\\":\\"(.*?)\\', page.text).group(1)
 
+    def _get_aura_response_body(self, payload):
+        response = requests.post(self.aura_url, data=payload)
+
+        j = json.loads(response.text)
+        return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+
     def fetch_rank_data(self):
         payload = AuraPayload(self.path)
         payload.add_action(
@@ -75,10 +81,7 @@ class Profile:
             },
         )
 
-        response = requests.post(self.aura_url, data=payload.json())
-
-        j = json.loads(response.text)
-        body = json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+        body = self._get_aura_response_body(payload.json())
 
         self.rank_data = body["value"][0]["ProfileCounts"][0]
 
@@ -95,9 +98,6 @@ class Profile:
                 {"userId": self.tbid, "skip": skip, "perPage": 30, "filter": "All"},
             )
 
-            response = requests.post(self.aura_url, data=payload.json())
-
-            j = json.loads(response.text)
-            body = json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+            body = self._get_aura_response_body(payload.json())
 
             self.awards = [*self.awards, *body["value"][0]["EarnedAwards"]]
