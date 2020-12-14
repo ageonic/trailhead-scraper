@@ -66,7 +66,7 @@ class Profile:
         self.first_name = re.search(r'FirstName\\":\\"(.*?)\\', page.text).group(1)
         self.last_name = re.search(r'LastName\\":\\"(.*?)\\', page.text).group(1)
 
-    def fetch_rank_details(self):
+    def fetch_rank_data(self):
         payload = AuraPayload(self.path)
         payload.add_action("TrailheadProfileService", "fetchTrailheadData", self.tbid)
 

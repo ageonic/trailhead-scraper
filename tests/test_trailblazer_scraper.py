@@ -14,9 +14,9 @@ def test_scrape_basics():
     assert len(u.tbid) == 18
 
 
-def test_fetch_rank_details():
+def test_fetch_rank_data():
     u = Profile("ecastelli")
     assert u.rank_data is None
-    u.fetch_rank_details()
+    u.fetch_rank_data()
     assert u.rank_data is not None
     assert "Id" in u.rank_data
