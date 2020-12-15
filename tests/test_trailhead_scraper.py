@@ -18,6 +18,17 @@ def test_incorrect_username():
         Profile("incorrect_username")
 
 
+def test_fetch_profile_data():
+    u = Profile("ecastelli")
+    assert u.profile_data is None
+    u.fetch_profile_data()
+    assert u.profile_data is not None
+    assert "profileUser" in u.profile_data
+
+    assert u.profile_data["profileUser"]["FirstName"] == "Emily"
+    assert u.profile_data["profileUser"]["LastName"] == "Castelli"
+
+
 def test_fetch_rank_data():
     u = Profile("ecastelli")
     assert u.rank_data is None

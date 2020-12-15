@@ -77,6 +77,7 @@ class Profile:
         self.url = self.base_url + self.path
         self.tbid = tbid
 
+        self.profile_data = None
         self.rank_data = None
         self.awards = []
 
@@ -111,6 +112,23 @@ class Profile:
 
         j = json.loads(response.text)
         return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+
+    def fetch_profile_data(self, keep_picklists=False):
+        """Retrieve all profile data for the Trailhead user.
+
+        Args:
+            keep_picklists (bool, optional): Keep the 'pickLists' attribute in the profile data (JSON) retrieved from the page. Defaults to False.
+        """
+        page = requests.get(self.url)
+
+        self.profile_data = json.loads(
+            re.search(r'profileData = JSON.parse\("(.*?)"\)', page.text)
+            .group(1)
+            .replace("\\", "")
+        )
+
+        if not keep_picklists and "pickLists" in self.profile_data:
+            del self.profile_data["pickLists"]
 
     def fetch_rank_data(self):
         """Retrieve rank information for the Trailhead user profile."""
