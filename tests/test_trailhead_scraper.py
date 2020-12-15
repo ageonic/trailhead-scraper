@@ -1,3 +1,4 @@
+import pytest
 from trailhead_scraper import Profile
 
 
@@ -7,11 +8,14 @@ def test_tbid_provided():
     assert u.tbid == test_tbid
 
 
-def test_scrape_basics():
+def test_correct_username():
     u = Profile("ecastelli")
-    assert u.first_name == "Emily"
-    assert u.last_name == "Castelli"
     assert len(u.tbid) == 18
+
+
+def test_incorrect_username():
+    with pytest.raises(Exception):
+        Profile("incorrect_username")
 
 
 def test_fetch_rank_data():

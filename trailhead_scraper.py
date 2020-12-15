@@ -76,23 +76,27 @@ class Profile:
         self.path = "/id/" + username
         self.url = self.base_url + self.path
         self.tbid = tbid
-        self.first_name = None
-        self.last_name = None
 
         self.rank_data = None
         self.awards = []
 
         # if the Trailblazer ID is not provided, retrieve it from the profile page
         if tbid is None:
-            self._scrape_basics()
+            self._get_tbid()
 
-    def _scrape_basics(self):
-        """Retrieve the Trailblazer ID, First Name, and Last Name for the current user by scraping the profile page."""
+    def _get_tbid(self):
+        """Retrieve the Trailblazer ID for the current user by scraping the profile page."""
         page = requests.get(self.url)
 
-        self.tbid = re.search(r"User\/(.*?)\\", page.text).group(1)
-        self.first_name = re.search(r'FirstName\\":\\"(.*?)\\', page.text).group(1)
-        self.last_name = re.search(r'LastName\\":\\"(.*?)\\', page.text).group(1)
+        try:
+            self.tbid = re.search(r"User\/(.*?)\\", page.text).group(1)
+        except:
+            # raise an exception if the tbid is not found - this prevents any of the other class methods from being executed
+            raise Exception(
+                "The TBID was not found for '{}'. The provided username may be incorrect or the profile may be private.".format(
+                    self.username
+                )
+            )
 
     def _get_aura_response_body(self, payload):
         """Perform the Aura Service POST request and return the parsed response body.
