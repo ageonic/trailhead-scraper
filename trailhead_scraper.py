@@ -4,6 +4,9 @@ import json
 
 __version__ = "0.1.0"
 
+base_profile_url = "https://trailblazer.me"
+aura_service_url = "https://trailblazer.me/aura"
+
 
 class AuraPayload:
     """Represents a request payload for Aura Services"""
@@ -62,9 +65,6 @@ class AuraPayload:
 class Profile:
     """A collection of user details, rank data, and awards collected from a Trailhead profile."""
 
-    base_url = "https://trailblazer.me"
-    aura_url = base_url + "/aura"
-
     def __init__(self, username, tbid=None):
         """Initialize the Trailhead profile.
 
@@ -74,7 +74,7 @@ class Profile:
         """
         self.username = username
         self.path = "/id/" + username
-        self.url = self.base_url + self.path
+        self.url = base_profile_url + self.path
         self.tbid = tbid
 
         self.profile_data = None
@@ -108,9 +108,9 @@ class Profile:
         Returns:
             dict: The parsed response body.
         """
-        response = requests.post(self.aura_url, data=payload)
+        response = requests.post(aura_service_url, data=payload)
 
-        j = json.loads(response.text)
+        j = response.json()
         return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
     def fetch_profile_data(self, keep_picklists=False):
