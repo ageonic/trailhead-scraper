@@ -63,12 +63,41 @@ class _AuraPayload:
         }
 
 
-def _check_aura_error(resp):
-    for action in resp["actions"]:
+def _get_tbid(url):
+    """Retrieve the Trailblazer ID for the user by scraping the profile page."""
+    page = requests.get(url)
+
+    try:
+        return re.search(r"User\/(.*?)\\", page.text).group(1)
+    except:
+        # raise an exception if the tbid is not found - this prevents any of the other methods from being executed
+        raise Exception(
+            "The TBID was not found for '{}'. The provided URL may be incorrect or the profile may be private.".format(
+                url
+            )
+        )
+
+
+def _get_aura_response_body(payload):
+    """Perform the Aura Service POST request and return the parsed response body.
+
+    Args:
+        payload (_AuraPayload): The payload that will be sent with the POST request.
+
+    Returns:
+        dict: The parsed response body.
+    """
+    response = requests.post(aura_service_url, data=payload)
+
+    j = response.json()
+
+    for action in j["actions"]:
         if action["state"] == "ERROR":
             raise Exception(
-                "Aura Error Encountered: {}".format(action["error"][0]["message"])
+                "Aura Action Error: {}".format(action["error"][0]["message"])
             )
+
+    return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
 
 class TrailheadProfile:
@@ -92,37 +121,7 @@ class TrailheadProfile:
 
         # if the Trailblazer ID is not provided, retrieve it from the profile page
         if tbid is None:
-            self._get_tbid()
-
-    def _get_tbid(self):
-        """Retrieve the Trailblazer ID for the current user by scraping the profile page."""
-        page = requests.get(self.url)
-
-        try:
-            self.tbid = re.search(r"User\/(.*?)\\", page.text).group(1)
-        except:
-            # raise an exception if the tbid is not found - this prevents any of the other class methods from being executed
-            raise Exception(
-                "The TBID was not found for '{}'. The provided username may be incorrect or the profile may be private.".format(
-                    self.username
-                )
-            )
-
-    def _get_aura_response_body(self, payload):
-        """Perform the Aura Service POST request and return the parsed response body.
-
-        Args:
-            payload (_AuraPayload): The payload that will be sent with the POST request.
-
-        Returns:
-            dict: The parsed response body.
-        """
-        response = requests.post(aura_service_url, data=payload)
-
-        j = response.json()
-        _check_aura_error(j)
-
-        return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+            self.tbid = _get_tbid(self.url)
 
     def fetch_profile_data(self, keep_picklists=False):
         """Retrieve all profile data for the Trailhead user.
@@ -152,7 +151,7 @@ class TrailheadProfile:
             },
         )
 
-        body = self._get_aura_response_body(payload.data)
+        body = _get_aura_response_body(payload.data)
 
         self.rank_data = body["value"][0]["ProfileCounts"][0]
 
@@ -170,6 +169,6 @@ class TrailheadProfile:
                 {"userId": self.tbid, "skip": skip, "perPage": 30, "filter": "All"},
             )
 
-            body = self._get_aura_response_body(payload.data)
+            body = _get_aura_response_body(payload.data)
 
             self.awards = [*self.awards, *body["value"][0]["EarnedAwards"]]
