@@ -82,7 +82,7 @@ def _get_aura_response_body(payload):
     """Perform the Aura Service POST request and return the parsed response body.
 
     Args:
-        payload (_AuraPayload): The payload that will be sent with the POST request.
+        payload (_AuraPayload): The data that will be sent with the POST request.
 
     Returns:
         dict: The parsed response body.
