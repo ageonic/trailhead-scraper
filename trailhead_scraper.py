@@ -8,7 +8,7 @@ base_profile_url = "https://trailblazer.me"
 aura_service_url = "https://trailblazer.me/aura"
 
 
-class AuraPayload:
+class _AuraPayload:
     """Represents a request payload for Aura Services"""
 
     def __init__(self, uri, action_descriptor=None):
@@ -48,7 +48,8 @@ class AuraPayload:
             }
         )
 
-    def json(self):
+    @property
+    def data(self):
         """Return the payload in an appropriate format.
 
         Returns:
@@ -103,7 +104,7 @@ class Profile:
         """Perform the Aura Service POST request and return the parsed response body.
 
         Args:
-            payload (AuraPayload): The payload that will be sent with the POST request.
+            payload (_AuraPayload): The payload that will be sent with the POST request.
 
         Returns:
             dict: The parsed response body.
@@ -132,7 +133,7 @@ class Profile:
 
     def fetch_rank_data(self):
         """Retrieve rank information for the Trailhead user profile."""
-        payload = AuraPayload(self.path)
+        payload = _AuraPayload(self.path)
         payload.add_action(
             "TrailheadProfileService",
             "fetchTrailheadData",
@@ -141,7 +142,7 @@ class Profile:
             },
         )
 
-        body = self._get_aura_response_body(payload.json())
+        body = self._get_aura_response_body(payload.data)
 
         self.rank_data = body["value"][0]["ProfileCounts"][0]
 
@@ -152,13 +153,13 @@ class Profile:
 
         for skip in range(0, self.rank_data["EarnedBadgeTotal"], 30):
 
-            payload = AuraPayload(self.path)
+            payload = _AuraPayload(self.path)
             payload.add_action(
                 "TrailheadProfileService",
                 "fetchTrailheadBadges",
                 {"userId": self.tbid, "skip": skip, "perPage": 30, "filter": "All"},
             )
 
-            body = self._get_aura_response_body(payload.json())
+            body = self._get_aura_response_body(payload.data)
 
             self.awards = [*self.awards, *body["value"][0]["EarnedAwards"]]
