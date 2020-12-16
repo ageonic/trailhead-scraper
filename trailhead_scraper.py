@@ -63,7 +63,7 @@ class _AuraPayload:
         }
 
 
-class Profile:
+class TrailheadProfile:
     """A collection of user details, rank data, and awards collected from a Trailhead profile."""
 
     def __init__(self, username, tbid=None):
