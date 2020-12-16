@@ -63,6 +63,14 @@ class _AuraPayload:
         }
 
 
+def _check_aura_error(resp):
+    for action in resp["actions"]:
+        if action["state"] == "ERROR":
+            raise Exception(
+                "Aura Error Encountered: {}".format(action["error"][0]["message"])
+            )
+
+
 class TrailheadProfile:
     """A collection of user details, rank data, and awards collected from a Trailhead profile."""
 
@@ -112,6 +120,8 @@ class TrailheadProfile:
         response = requests.post(aura_service_url, data=payload)
 
         j = response.json()
+        _check_aura_error(j)
+
         return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
     def fetch_profile_data(self, keep_picklists=False):

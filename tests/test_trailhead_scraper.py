@@ -18,6 +18,18 @@ def test_incorrect_username():
         TrailheadProfile("incorrect_username")
 
 
+def test_incorrect_tbid_fetch_rank_data():
+    with pytest.raises(Exception):
+        u = TrailheadProfile("ecastelli", "1234567890")
+        u.fetch_rank_data()
+
+
+def test_incorrect_tbid_fetch_awards():
+    with pytest.raises(Exception):
+        u = TrailheadProfile("ecastelli", "1234567890")
+        u.fetch_awards()
+
+
 def test_fetch_profile_data():
     u = TrailheadProfile("ecastelli")
     assert u.profile_data is None
