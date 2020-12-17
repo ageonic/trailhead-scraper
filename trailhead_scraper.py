@@ -15,7 +15,6 @@ class _AuraPayload:
         """Initialize the payload.
 
         Args:
-            uri (str): The path to the Trailhead profile page.
             action_descriptor (str, optional): The value that will be used as the descriptor value in the payload. Defaults to 'aura://ApexActionController/ACTION$execute'.
         """
         self.message = {"actions": []}
@@ -62,6 +61,14 @@ class _AuraPayload:
 
 
 def _build_profile_url(username):
+    """Generate a profile URL using the base profile URL and the specified username.
+
+    Args:
+        username (str): The Trailhead username for the user.
+
+    Returns:
+        str: The complete profile URL for the user.
+    """
     return "{}/id/{}".format(base_profile_url, username)
 
 
@@ -88,7 +95,17 @@ def _get_aura_response_body(payload):
 
 
 def fetch_tbid(username):
-    """Retrieve the Trailblazer ID for the user by scraping the profile page."""
+    """Retrieve the Trailblazer ID for a user by scraping the Trailhead profile page.
+
+    Args:
+        username (str): The Trailhead username for the user.
+
+    Raises:
+        Exception: Unable to retrieve TBID if the username is incorrect or the Trailhead profile is private.
+
+    Returns:
+        str: The Trailblazer ID (TBID) for the specified username.
+    """
     page = requests.get(_build_profile_url(username))
 
     try:
@@ -100,10 +117,17 @@ def fetch_tbid(username):
 
 
 def fetch_profile_data(username, keep_picklists=False):
-    """Retrieve all profile data for the Trailhead user.
+    """Retrieve all profile data for the specified Trailhead username.
 
     Args:
+        username (str): The Trailhead username for the user.
         keep_picklists (bool, optional): Keep the 'pickLists' attribute in the profile data (JSON) retrieved from the page. Defaults to False.
+
+    Raises:
+        Exception: Unable to retrieve profile data if username is incorrect.
+
+    Returns:
+        dict: The profile data retrieved from the profile page.
     """
     page = requests.get(_build_profile_url(username))
 
@@ -125,7 +149,15 @@ def fetch_profile_data(username, keep_picklists=False):
 
 
 def fetch_rank_data(username, tbid=None):
-    """Retrieve rank information for the Trailhead user profile."""
+    """Retrieve rank information for the specified Trailhead username.
+
+    Args:
+        username (str): The Trailhead username for the user.
+        tbid (str, optional): The Trailblazer ID (TBID) for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
+
+    Returns:
+        dict: All rank details for the user.
+    """
     payload = _AuraPayload()
     payload.add_action(
         "TrailheadProfileService",
@@ -141,7 +173,16 @@ def fetch_rank_data(username, tbid=None):
 
 
 def fetch_awards(username, tbid=None, limit=None):
-    """Retrieve all awards for the Trailhead user profile."""
+    """Retrieve award information for the specified Trailhead username.
+
+    Args:
+        username (str): The Trailhead username for the user.
+        tbid (str, optional): The Trailblazer ID (TBID) for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
+        limit (int, optional): The maximum number of awards to return. Defaults to None and returns all awards.
+
+    Returns:
+        list: A list of awards retrieved for the user.
+    """
     if tbid is None:
         tbid = fetch_tbid(username)
 
