@@ -195,17 +195,26 @@ def fetch_awards(username, user_id=None, limit=None):
     awards = []
 
     for skip in range(0, limit, 30):
-
         payload = _AuraPayload()
         payload.add_action(
             "TrailheadProfileService",
             "fetchTrailheadBadges",
-            {"userId": user_id, "skip": skip, "perPage": 30, "filter": "All"},
+            {
+                "userId": user_id,
+                "skip": skip,
+                "perPage": min(limit - skip, 30),
+                "filter": "All",
+            },
         )
 
         # _aura_response_body will only yield one item in this case
         # since only one action was added to the payload
         for body in _aura_response_body(payload.data):
+
+            # end the loop if no awards are returned
+            if len(body["value"][0]["EarnedAwards"]) == 0:
+                return awards
+
             awards = [*awards, *body["value"][0]["EarnedAwards"]]
 
     return awards

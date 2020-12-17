@@ -78,10 +78,15 @@ def test_fetch_awards_with_total_total_badge_count(
     assert len(awards) == earned_badge_total
 
 
-def test_fetch_awards_with_limit(username, user_id, earned_badge_total):
-    lim = earned_badge_total - (earned_badge_total % 30)
+def test_fetch_awards_with_smaller_limit(username, user_id, earned_badge_total):
+    awards = fetch_awards(username, limit=1)
+    assert len(awards) == 1
+
+
+def test_fetch_awards_with_greater_limit(username, user_id, earned_badge_total):
+    lim = earned_badge_total + 12
     awards = fetch_awards(username, limit=lim)
-    assert len(awards) == lim
+    assert len(awards) == earned_badge_total
 
 
 def test_fetch_awards_with_user_id_and_badge_count(
