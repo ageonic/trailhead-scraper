@@ -72,8 +72,8 @@ def _build_profile_url(username):
     return "{}/id/{}".format(base_profile_url, username)
 
 
-def _get_aura_response_body(payload):
-    """Perform the Aura Service POST request and return the parsed response body.
+def _aura_response_body(payload):
+    """Perform the Aura Service POST request and yield the parsed response body for each action.
 
     Args:
         payload (_AuraPayload): The data that will be sent with the POST request.
@@ -91,7 +91,7 @@ def _get_aura_response_body(payload):
                 "Aura Action Error: {}".format(action["error"][0]["message"])
             )
 
-    return json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
+        yield json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
 
 def fetch_tbid(username):
@@ -167,9 +167,10 @@ def fetch_rank_data(username, tbid=None):
         },
     )
 
-    body = _get_aura_response_body(payload.data)
-
-    return body["value"][0]["ProfileCounts"][0]
+    # _aura_response_body will only yield one item in this case
+    # since only one action was added to the payload
+    for body in _aura_response_body(payload.data):
+        return body["value"][0]["ProfileCounts"][0]
 
 
 def fetch_awards(username, tbid=None, limit=None):
@@ -200,8 +201,9 @@ def fetch_awards(username, tbid=None, limit=None):
             {"userId": tbid, "skip": skip, "perPage": 30, "filter": "All"},
         )
 
-        body = _get_aura_response_body(payload.data)
-
-        awards = [*awards, *body["value"][0]["EarnedAwards"]]
+        # _aura_response_body will only yield one item in this case
+        # since only one action was added to the payload
+        for body in _aura_response_body(payload.data):
+            awards = [*awards, *body["value"][0]["EarnedAwards"]]
 
     return awards
