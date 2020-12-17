@@ -3,6 +3,11 @@ name = "trailhead-scraper"
 version = "0.1.0"
 description = "Retrieve public data from Salesforce Trailhead user profiles"
 authors = ["Aaron George <angeorge.dev@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "https://github.com/ang3orge/trailhead-scraper"
+repository = "https://github.com/ang3orge/trailhead-scraper"
+keywords = ["salesforce", "trailhead", "scraper"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
