@@ -1,56 +1,87 @@
 import pytest
-from trailhead_scraper import TrailheadProfile
+from trailhead_scraper import (
+    fetch_tbid,
+    fetch_profile_data,
+    fetch_rank_data,
+    fetch_awards,
+)
 
 
-def test_tbid_provided():
-    test_tbid = "testtbid"
-    u = TrailheadProfile("ecastelli", test_tbid)
-    assert u.tbid == test_tbid
+def test_fetch_tbid(username):
+    assert len(fetch_tbid(username)) == 18
 
 
-def test_correct_username():
-    u = TrailheadProfile("ecastelli")
-    assert len(u.tbid) == 18
-
-
-def test_incorrect_username():
+def test_fetch_tbid_incorrect_username(incorrect_username):
     with pytest.raises(Exception):
-        TrailheadProfile("incorrect_username")
+        fetch_tbid(incorrect_username)
 
 
-def test_incorrect_tbid_fetch_rank_data():
+def test_fetch_profile_data(username):
+    profile_data = fetch_profile_data(username)
+    assert "profileUser" in profile_data
+
+    assert profile_data["profileUser"]["LastName"] == "Castelli"
+    assert profile_data["profileUser"]["FirstName"] == "Emily"
+
+
+def test_fetch_profile_data_incorrect_username(incorrect_username):
     with pytest.raises(Exception):
-        u = TrailheadProfile("ecastelli", "1234567890")
-        u.fetch_rank_data()
+        fetch_profile_data(incorrect_username)
 
 
-def test_incorrect_tbid_fetch_awards():
+def test_fetch_rank_data(username):
+    rank_data = fetch_rank_data(username)
+    assert "EarnedBadgeTotal" in rank_data
+    assert rank_data["EarnedBadgeTotal"] > 0
+
+
+def test_fetch_rank_data_incorrect_username(incorrect_username):
     with pytest.raises(Exception):
-        u = TrailheadProfile("ecastelli", "1234567890")
-        u.fetch_awards()
+        fetch_rank_data(incorrect_username)
 
 
-def test_fetch_profile_data():
-    u = TrailheadProfile("ecastelli")
-    assert u.profile_data is None
-    u.fetch_profile_data()
-    assert u.profile_data is not None
-    assert "profileUser" in u.profile_data
-
-    assert u.profile_data["profileUser"]["FirstName"] == "Emily"
-    assert u.profile_data["profileUser"]["LastName"] == "Castelli"
+def test_fetch_rank_data_with_tbid(username, tbid):
+    rank_data = fetch_rank_data(username, tbid=tbid)
+    assert "EarnedBadgeTotal" in rank_data
+    assert rank_data["EarnedBadgeTotal"] > 0
 
 
-def test_fetch_rank_data():
-    u = TrailheadProfile("ecastelli")
-    assert u.rank_data is None
-    u.fetch_rank_data()
-    assert u.rank_data is not None
-    assert "Id" in u.rank_data
+def test_fetch_rank_data_incorrect_tbid(username, incorrect_tbid):
+    with pytest.raises(Exception):
+        fetch_rank_data(username, tbid=incorrect_tbid)
 
 
-def test_fetch_awards():
-    u = TrailheadProfile("ecastelli")
-    assert len(u.awards) <= 0
-    u.fetch_awards()
-    assert len(u.awards) > 0
+def test_fetch_awards(username, earned_badge_total):
+    awards = fetch_awards(username)
+    assert len(awards) == earned_badge_total
+
+
+def test_fetch_awards_incorrect_username(incorrect_username):
+    with pytest.raises(Exception):
+        fetch_awards(incorrect_username)
+
+
+def test_fetch_awards_with_tbid(username, tbid, earned_badge_total):
+    awards = fetch_awards(username, tbid=tbid)
+    assert len(awards) == earned_badge_total
+
+
+def test_fetch_awards_incorrect_tbid(username, incorrect_tbid):
+    with pytest.raises(Exception):
+        fetch_awards(username, tbid=incorrect_tbid)
+
+
+def test_fetch_awards_with_total_total_badge_count(username, tbid, earned_badge_total):
+    awards = fetch_awards(username, limit=earned_badge_total)
+    assert len(awards) == earned_badge_total
+
+
+def test_fetch_awards_with_limit(username, tbid, earned_badge_total):
+    lim = earned_badge_total - (earned_badge_total % 30)
+    awards = fetch_awards(username, limit=lim)
+    assert len(awards) == lim
+
+
+def test_fetch_awards_with_tbid_and_badge_count(username, tbid, earned_badge_total):
+    awards = fetch_awards(username, tbid=tbid, limit=earned_badge_total)
+    assert len(awards) == earned_badge_total
