@@ -96,17 +96,17 @@ def _aura_response_body(payload):
         yield json.loads(j["actions"][0]["returnValue"]["returnValue"]["body"])
 
 
-def fetch_tbid(username):
-    """Retrieve the Trailblazer ID for a user by scraping the Trailhead profile page.
+def fetch_user_id(username):
+    """Retrieve the User ID for a user by scraping the Trailhead profile page.
 
     Args:
         username (str): The Trailhead username for the user.
 
     Raises:
-        Exception: Unable to retrieve TBID if the username is incorrect or the Trailhead profile is private.
+        Exception: Unable to retrieve User ID if the username is incorrect or the Trailhead profile is private.
 
     Returns:
-        str: The Trailblazer ID (TBID) for the specified username.
+        str: The User ID for the specified username.
     """
     page = requests.get(_build_profile_url(username))
 
@@ -114,7 +114,7 @@ def fetch_tbid(username):
         return re.search(r"User\/(.*?)\\", page.text).group(1)
     except:
         raise Exception(
-            "Unable to retrieve TBID. The provided username may be incorrect or the profile may be private."
+            "Unable to retrieve user ID. The provided username may be incorrect or the profile may be private."
         )
 
 
@@ -150,12 +150,12 @@ def fetch_profile_data(username, keep_picklists=False):
         )
 
 
-def fetch_rank_data(username, tbid=None):
+def fetch_rank_data(username, user_id=None):
     """Retrieve rank information for the specified Trailhead username.
 
     Args:
         username (str): The Trailhead username for the user.
-        tbid (str, optional): The Trailblazer ID (TBID) for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
+        user_id (str, optional): The ID for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
 
     Returns:
         dict: All rank details for the user.
@@ -165,7 +165,7 @@ def fetch_rank_data(username, tbid=None):
         "TrailheadProfileService",
         "fetchTrailheadData",
         {
-            "userId": tbid or fetch_tbid(username),
+            "userId": user_id or fetch_user_id(username),
         },
     )
 
@@ -175,22 +175,22 @@ def fetch_rank_data(username, tbid=None):
         return body["value"][0]["ProfileCounts"][0]
 
 
-def fetch_awards(username, tbid=None, limit=None):
+def fetch_awards(username, user_id=None, limit=None):
     """Retrieve award information for the specified Trailhead username.
 
     Args:
         username (str): The Trailhead username for the user.
-        tbid (str, optional): The Trailblazer ID (TBID) for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
+        user_id (str, optional): The ID for the user. Provide this to prevent an unnecessary HTTP request. Defaults to None.
         limit (int, optional): The maximum number of awards to return. Defaults to None and returns all awards.
 
     Returns:
         list: A list of awards retrieved for the user.
     """
-    if tbid is None:
-        tbid = fetch_tbid(username)
+    if user_id is None:
+        user_id = fetch_user_id(username)
 
     if limit is None:
-        limit = fetch_rank_data(username, tbid)["EarnedBadgeTotal"]
+        limit = fetch_rank_data(username, user_id)["EarnedBadgeTotal"]
 
     awards = []
 
@@ -200,7 +200,7 @@ def fetch_awards(username, tbid=None, limit=None):
         payload.add_action(
             "TrailheadProfileService",
             "fetchTrailheadBadges",
-            {"userId": tbid, "skip": skip, "perPage": 30, "filter": "All"},
+            {"userId": user_id, "skip": skip, "perPage": 30, "filter": "All"},
         )
 
         # _aura_response_body will only yield one item in this case

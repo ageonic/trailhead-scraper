@@ -1,5 +1,5 @@
 import pytest
-from trailhead_scraper import fetch_tbid, fetch_rank_data
+from trailhead_scraper import fetch_user_id, fetch_rank_data
 
 
 @pytest.fixture
@@ -13,15 +13,15 @@ def incorrect_username():
 
 
 @pytest.fixture
-def tbid(username):
-    return fetch_tbid(username)
+def user_id(username):
+    return fetch_user_id(username)
 
 
 @pytest.fixture
-def incorrect_tbid():
-    return "incorrect-tbid"
+def incorrect_user_id():
+    return "incorrect-user-id"
 
 
 @pytest.fixture
-def earned_badge_total(username, tbid):
-    return fetch_rank_data(username, tbid=tbid)["EarnedBadgeTotal"]
+def earned_badge_total(username, user_id):
+    return fetch_rank_data(username, user_id=user_id)["EarnedBadgeTotal"]
