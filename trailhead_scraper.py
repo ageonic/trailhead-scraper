@@ -2,12 +2,20 @@ import requests
 import re
 import json
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 base_profile_url = "https://trailblazer.me"
 aura_service_url = "https://trailblazer.me/aura"
+aura_config_url = (
+    base_profile_url
+    + "/c/ProfileApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT"
+)
 
-aura_ctx_fwuid = "dDIdorNC3N22LalQ5i3slQ"
+
+def _get_fwuid():
+    response = requests.get(aura_config_url)
+
+    return response.json()["delegateVersion"]
 
 
 class _AuraPayload:
@@ -20,7 +28,7 @@ class _AuraPayload:
             action_descriptor (str, optional): The value that will be used as the descriptor value in the payload. Defaults to 'aura://ApexActionController/ACTION$execute'.
         """
         self.message = {"actions": []}
-        self.aura_context = {"fwuid": aura_ctx_fwuid, "app": "c:ProfileApp"}
+        self.aura_context = {"fwuid": _get_fwuid(), "app": "c:ProfileApp"}
         self.aura_token = "undefined"
         self.action_descriptor = (
             action_descriptor or "aura://ApexActionController/ACTION$execute"
